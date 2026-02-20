@@ -78,6 +78,12 @@ const SellerLogin = () => {
               )}
             </Button>
 
+            <p className="text-center text-sm">
+              <Link to="/account/forgot-password" className="text-primary hover:underline">
+                パスワードを忘れた方
+              </Link>
+            </p>
+
             <p className="text-center text-sm text-muted-foreground">
               アカウントをお持ちでない方は
               <Link to="/seller/register" className="text-primary hover:underline ml-1">

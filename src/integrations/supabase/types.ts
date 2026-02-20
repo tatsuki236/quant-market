@@ -196,6 +196,11 @@ export type Database = {
           sort_order: number
           created_at: string
           updated_at: string
+          free_content: string | null
+          paid_content: string | null
+          rating_average: number | null
+          rating_count: number
+          status: string
         }
         Insert: {
           id?: string
@@ -220,6 +225,11 @@ export type Database = {
           sort_order?: number
           created_at?: string
           updated_at?: string
+          free_content?: string | null
+          paid_content?: string | null
+          rating_average?: number | null
+          rating_count?: number
+          status?: string
         }
         Update: {
           id?: string
@@ -244,8 +254,61 @@ export type Database = {
           sort_order?: number
           created_at?: string
           updated_at?: string
+          free_content?: string | null
+          paid_content?: string | null
+          rating_average?: number | null
+          rating_count?: number
+          status?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          id: string
+          product_id: string
+          customer_id: string
+          auth_user_id: string
+          rating: number
+          comment: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          product_id: string
+          customer_id: string
+          auth_user_id: string
+          rating: number
+          comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          product_id?: string
+          customer_id?: string
+          auth_user_id?: string
+          rating?: number
+          comment?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       sellers: {
         Row: {
@@ -262,6 +325,7 @@ export type Database = {
           bank_account_holder: string | null
           is_approved: boolean
           is_active: boolean
+          is_admin: boolean
           created_at: string
           updated_at: string
         }
@@ -279,6 +343,7 @@ export type Database = {
           bank_account_holder?: string | null
           is_approved?: boolean
           is_active?: boolean
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -296,6 +361,7 @@ export type Database = {
           bank_account_holder?: string | null
           is_approved?: boolean
           is_active?: boolean
+          is_admin?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -313,6 +379,28 @@ export type Database = {
           p_auth_user_id?: string | null
         }
         Returns: string
+      }
+      has_purchased_product: {
+        Args: {
+          p_product_id: string
+        }
+        Returns: boolean
+      }
+      get_product_reviews: {
+        Args: {
+          p_product_id: string
+        }
+        Returns: {
+          id: string
+          product_id: string
+          customer_id: string
+          auth_user_id: string
+          rating: number
+          comment: string | null
+          created_at: string
+          updated_at: string
+          reviewer_name: string
+        }[]
       }
     }
     Enums: {

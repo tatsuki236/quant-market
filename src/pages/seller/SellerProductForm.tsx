@@ -6,10 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, ArrowLeft, Upload, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useSellerProduct, useCreateProduct, useUpdateProduct } from "@/hooks/use-seller-products";
 import { useProductImage } from "@/hooks/use-product-image";
+
+const RichEditor = lazy(() => import("@/components/ui/rich-editor"));
 
 const SellerProductForm = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,6 +28,7 @@ const SellerProductForm = () => {
     name: "",
     description: "",
     price: "",
+    category: "indicator" as string,
     platform: "MT4",
     market: "FX" as string,
     icon_name: "TrendingUp",
@@ -36,6 +39,8 @@ const SellerProductForm = () => {
     market_condition: "",
     backtest_info: "",
     detail_features: "",
+    free_content: "",
+    paid_content: "",
   });
 
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -52,6 +57,7 @@ const SellerProductForm = () => {
         name: existingProduct.name,
         description: existingProduct.description,
         price: existingProduct.price.toString(),
+        category: existingProduct.category ?? "indicator",
         platform: existingProduct.platform,
         market: existingProduct.market,
         icon_name: existingProduct.icon_name,
@@ -62,6 +68,8 @@ const SellerProductForm = () => {
         market_condition: existingProduct.market_condition ?? "",
         backtest_info: existingProduct.backtest_info ?? "",
         detail_features: existingProduct.detail_features?.join("\n") ?? "",
+        free_content: existingProduct.free_content ?? "",
+        paid_content: existingProduct.paid_content ?? "",
       });
       if (existingProduct.image && existingProduct.image !== "/placeholder.svg") {
         setExistingImageUrl(existingProduct.image);
@@ -144,8 +152,9 @@ const SellerProductForm = () => {
       name: form.name,
       description: form.description,
       price,
-      platform: form.platform,
-      market: form.market,
+      category: form.category,
+      platform: form.category === "有料記事" ? "-" : form.platform,
+      market: form.category === "有料記事" ? "その他" : form.market,
       icon_name: form.icon_name,
       features: splitComma(form.features),
       full_description: form.full_description || null,
@@ -154,6 +163,8 @@ const SellerProductForm = () => {
       market_condition: form.market_condition || null,
       backtest_info: form.backtest_info || null,
       detail_features: splitNewline(form.detail_features),
+      free_content: form.free_content || null,
+      paid_content: form.paid_content || null,
     };
 
     if (imageUrl) {
@@ -193,39 +204,27 @@ const SellerProductForm = () => {
 
   return (
     <Layout>
-      <section className="py-16 lg:py-20">
-        <div className="section-container max-w-2xl mx-auto">
-          <button
-            onClick={() => navigate("/seller/products")}
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            商品一覧に戻る
-          </button>
-
-          <h1 className="text-2xl font-bold mb-8">
-            {isEditing ? "商品を編集" : "新しい商品を出品"}
-          </h1>
+      <section className="py-10 lg:py-14">
+        <div className="section-container">
+          {/* ヘッダー */}
+          <div className="flex items-center justify-between mb-6 max-w-3xl mx-auto">
+            <button
+              onClick={() => navigate("/seller/products")}
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              商品一覧に戻る
+            </button>
+            <h1 className="text-lg font-bold">
+              {isEditing ? "商品を編集" : "新しい商品を出品"}
+            </h1>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* 基本情報 */}
-            <div className="p-6 rounded-xl bg-card border border-border space-y-4">
-              <h2 className="text-lg font-semibold">基本情報</h2>
-
-              <div className="space-y-2">
-                <Label htmlFor="slug">スラッグ（URL用ID）</Label>
-                <Input
-                  id="slug"
-                  value={form.slug}
-                  onChange={(e) => handleChange("slug", e.target.value)}
-                  placeholder="my-indicator-tool"
-                  required
-                  disabled={isEditing}
-                />
-                <p className="text-xs text-muted-foreground">英数字とハイフンのみ。一度設定すると変更できません。</p>
-              </div>
-
-              <div className="space-y-2">
+            {/* ====== G1: 商品情報 + G2: 販売設定 — コンパクトにまとめる ====== */}
+            <div className="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-card border border-border">
+              {/* 商品名（フルワイド） */}
+              <div className="space-y-2 mb-4">
                 <Label htmlFor="name">商品名</Label>
                 <Input
                   id="name"
@@ -233,10 +232,12 @@ const SellerProductForm = () => {
                   onChange={(e) => handleChange("name", e.target.value)}
                   placeholder="トレンドマスター Pro"
                   required
+                  className="text-base"
                 />
               </div>
 
-              <div className="space-y-2">
+              {/* 概要説明（フルワイド） */}
+              <div className="space-y-2 mb-4">
                 <Label htmlFor="description">概要説明</Label>
                 <Textarea
                   id="description"
@@ -244,125 +245,137 @@ const SellerProductForm = () => {
                   onChange={(e) => handleChange("description", e.target.value)}
                   placeholder="商品の簡単な説明"
                   required
-                  rows={3}
+                  rows={2}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="price">価格（円）</Label>
+              {/* コンパクトグリッド: スラッグ・カテゴリ・価格 */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                <div className="space-y-1 col-span-2 sm:col-span-1">
+                  <Label htmlFor="slug" className="text-xs">スラッグ</Label>
                   <Input
-                    id="price"
+                    id="slug"
+                    value={form.slug}
+                    onChange={(e) => handleChange("slug", e.target.value)}
+                    placeholder="my-product"
+                    required
+                    disabled={isEditing}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">カテゴリ</Label>
+                  <Select value={form.category} onValueChange={(v) => handleChange("category", v)}>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="indicator">インジケータ</SelectItem>
+                      <SelectItem value="有料記事">電子書籍</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">価格（円）</Label>
+                  <Input
                     type="number"
                     value={form.price}
                     onChange={(e) => handleChange("price", e.target.value)}
                     placeholder="12800"
                     required
                     min={1}
+                    className="h-9 text-sm"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>プラットフォーム</Label>
-                  <Select value={form.platform} onValueChange={(v) => handleChange("platform", v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="MT4">MT4</SelectItem>
-                      <SelectItem value="MT5">MT5</SelectItem>
-                      <SelectItem value="MT4/MT5">MT4/MT5</SelectItem>
-                      <SelectItem value="TradingView">TradingView</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>対象市場</Label>
-                  <Select value={form.market} onValueChange={(v) => handleChange("market", v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="FX">FX</SelectItem>
-                      <SelectItem value="株式">株式</SelectItem>
-                      <SelectItem value="仮想通貨">仮想通貨</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>アイコン</Label>
-                  <Select value={form.icon_name} onValueChange={(v) => handleChange("icon_name", v)}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="TrendingUp">TrendingUp</SelectItem>
-                      <SelectItem value="LineChart">LineChart</SelectItem>
-                      <SelectItem value="BarChart3">BarChart3</SelectItem>
-                      <SelectItem value="Activity">Activity</SelectItem>
-                      <SelectItem value="Zap">Zap</SelectItem>
-                      <SelectItem value="Target">Target</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="features">特徴タグ（カンマ区切り）</Label>
-                <Input
-                  id="features"
-                  value={form.features}
-                  onChange={(e) => handleChange("features", e.target.value)}
-                  placeholder="移動平均, トレンド分析, 売買シグナル"
-                />
-              </div>
-            </div>
-
-            {/* 商品画像 */}
-            <div className="p-6 rounded-xl bg-card border border-border space-y-4">
-              <h2 className="text-lg font-semibold">商品画像</h2>
-
-              {currentImage ? (
-                <div className="relative">
-                  <img
-                    src={currentImage}
-                    alt="商品画像プレビュー"
-                    className="w-full max-h-64 object-contain rounded-lg border border-border bg-muted"
-                  />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 p-1 rounded-full bg-background/80 border border-border hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                  {imageFile && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      新しい画像: {imageFile.name}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`
-                    flex flex-col items-center justify-center p-8 rounded-lg border-2 border-dashed cursor-pointer transition-colors
-                    ${isDragging
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                    }
-                  `}
-                >
-                  <Upload className="h-8 w-8 text-muted-foreground mb-3" />
-                  <p className="text-sm font-medium">クリックまたはドラッグ&ドロップで画像をアップロード</p>
-                  <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WebP（最大5MB）</p>
+              {/* インジケータ専用: プラットフォーム・市場・アイコン */}
+              {form.category !== "有料記事" && (
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs">プラットフォーム</Label>
+                    <Select value={form.platform} onValueChange={(v) => handleChange("platform", v)}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MT4">MT4</SelectItem>
+                        <SelectItem value="MT5">MT5</SelectItem>
+                        <SelectItem value="MT4/MT5">MT4/MT5</SelectItem>
+                        <SelectItem value="TradingView">TradingView</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">対象市場</Label>
+                    <Select value={form.market} onValueChange={(v) => handleChange("market", v)}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="FX">FX</SelectItem>
+                        <SelectItem value="株式">株式</SelectItem>
+                        <SelectItem value="仮想通貨">仮想通貨</SelectItem>
+                        <SelectItem value="その他">その他</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">アイコン</Label>
+                    <Select value={form.icon_name} onValueChange={(v) => handleChange("icon_name", v)}>
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="TrendingUp">TrendingUp</SelectItem>
+                        <SelectItem value="LineChart">LineChart</SelectItem>
+                        <SelectItem value="BarChart3">BarChart3</SelectItem>
+                        <SelectItem value="Activity">Activity</SelectItem>
+                        <SelectItem value="Zap">Zap</SelectItem>
+                        <SelectItem value="Target">Target</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
+
+              {/* 特徴タグ + 画像 横並び */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label className="text-xs">特徴タグ（カンマ区切り）</Label>
+                  <Input
+                    value={form.features}
+                    onChange={(e) => handleChange("features", e.target.value)}
+                    placeholder="移動平均, トレンド分析"
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">商品画像</Label>
+                  {currentImage ? (
+                    <div className="relative h-9 flex items-center gap-2">
+                      <img src={currentImage} alt="" className="h-9 w-14 object-contain rounded border border-border bg-muted" />
+                      <span className="text-xs text-muted-foreground truncate flex-1">{imageFile?.name || "設定済み"}</span>
+                      <button type="button" onClick={removeImage} className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive">
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      onDrop={handleDrop}
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`h-9 flex items-center justify-center rounded-md border border-dashed cursor-pointer text-xs transition-colors ${
+                        isDragging ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 text-muted-foreground"
+                      }`}
+                    >
+                      <Upload className="h-3.5 w-3.5 mr-1.5" />
+                      画像をアップロード
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -374,120 +387,91 @@ const SellerProductForm = () => {
                   if (file) handleFileSelect(file);
                 }}
               />
-
-              {!currentImage && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  ファイルを選択
-                </Button>
-              )}
             </div>
 
-            {/* 詳細情報 */}
-            <div className="p-6 rounded-xl bg-card border border-border space-y-4">
-              <h2 className="text-lg font-semibold">詳細情報（任意）</h2>
+            {/* ====== G3: コンテンツ — メイン領域 ====== */}
 
-              <div className="space-y-2">
-                <Label htmlFor="full_description">商品の詳細説明</Label>
-                <Textarea
-                  id="full_description"
-                  value={form.full_description}
-                  onChange={(e) => handleChange("full_description", e.target.value)}
-                  rows={5}
-                  placeholder="商品の詳細な説明..."
-                />
-              </div>
+            {/* 電子書籍: リッチエディタ */}
+            {form.category === "有料記事" && (
+              <div className="space-y-6">
+                <Suspense fallback={<div className="h-[400px] rounded-xl border border-border bg-muted animate-pulse" />}>
+                  <RichEditor
+                    value={form.free_content}
+                    onChange={(html) => handleChange("free_content", html)}
+                    placeholder="無料で公開する記事の内容を入力..."
+                    label="無料パート（誰でも閲覧可能）"
+                  />
+                </Suspense>
 
-              <div className="space-y-2">
-                <Label htmlFor="technical_logic">テクニカル分析ロジック</Label>
-                <Textarea
-                  id="technical_logic"
-                  value={form.technical_logic}
-                  onChange={(e) => handleChange("technical_logic", e.target.value)}
-                  rows={4}
-                  placeholder="使用するテクニカル指標やロジックの説明..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="indicators">使用指標（カンマ区切り）</Label>
-                <Input
-                  id="indicators"
-                  value={form.indicators}
-                  onChange={(e) => handleChange("indicators", e.target.value)}
-                  placeholder="移動平均（EMA）, トレンド強度スコア"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="market_condition">想定相場・使用条件</Label>
-                <Textarea
-                  id="market_condition"
-                  value={form.market_condition}
-                  onChange={(e) => handleChange("market_condition", e.target.value)}
-                  rows={3}
-                  placeholder="どのような相場で有効か..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backtest_info">バックテスト情報</Label>
-                <Textarea
-                  id="backtest_info"
-                  value={form.backtest_info}
-                  onChange={(e) => handleChange("backtest_info", e.target.value)}
-                  rows={3}
-                  placeholder="過去データでの検証結果..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="detail_features">機能一覧（1行1項目）</Label>
-                <Textarea
-                  id="detail_features"
-                  value={form.detail_features}
-                  onChange={(e) => handleChange("detail_features", e.target.value)}
-                  rows={4}
-                  placeholder={"エントリーシグナル表示\nトレンド強度メーター\nアラート機能"}
-                />
-              </div>
-            </div>
-
-            {/* 審査に関する注意 */}
-            {!isEditing && (
-              <div className="p-4 rounded-lg bg-muted/50 border border-border">
-                <p className="text-sm text-muted-foreground">
-                  出品された商品は管理者の審査後に掲載されます。審査完了までしばらくお待ちください。
-                </p>
+                <Suspense fallback={<div className="h-[400px] rounded-xl border border-border bg-muted animate-pulse" />}>
+                  <RichEditor
+                    value={form.paid_content}
+                    onChange={(html) => handleChange("paid_content", html)}
+                    placeholder="有料コンテンツの内容を入力..."
+                    label="有料パート（購入者のみ閲覧可能）"
+                  />
+                </Suspense>
               </div>
             )}
 
-            {/* 送信 */}
-            <div className="flex gap-4">
-              <Button type="submit" variant="hero" className="flex-1" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {isUploadingImage ? "画像アップロード中..." : "保存中..."}
-                  </>
-                ) : isEditing ? (
-                  "商品を更新"
-                ) : (
-                  "商品を出品"
-                )}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate("/seller/products")}
-              >
-                キャンセル
-              </Button>
+            {/* インジケータ: 詳細情報 */}
+            {form.category !== "有料記事" && (
+              <div className="max-w-3xl mx-auto p-4 sm:p-6 rounded-xl bg-card border border-border space-y-4">
+                <h2 className="text-sm font-semibold text-muted-foreground">詳細情報（任意）</h2>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label className="text-xs">商品の詳細説明</Label>
+                    <Textarea value={form.full_description} onChange={(e) => handleChange("full_description", e.target.value)} rows={4} placeholder="商品の詳細な説明..." />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">テクニカル分析ロジック</Label>
+                    <Textarea value={form.technical_logic} onChange={(e) => handleChange("technical_logic", e.target.value)} rows={3} placeholder="使用するテクニカル指標やロジックの説明..." />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">想定相場・使用条件</Label>
+                    <Textarea value={form.market_condition} onChange={(e) => handleChange("market_condition", e.target.value)} rows={3} placeholder="どのような相場で有効か..." />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">使用指標（カンマ区切り）</Label>
+                    <Input value={form.indicators} onChange={(e) => handleChange("indicators", e.target.value)} placeholder="移動平均（EMA）, トレンド強度スコア" className="h-9 text-sm" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">バックテスト情報</Label>
+                    <Textarea value={form.backtest_info} onChange={(e) => handleChange("backtest_info", e.target.value)} rows={2} placeholder="過去データでの検証結果..." />
+                  </div>
+                  <div className="space-y-1 sm:col-span-2">
+                    <Label className="text-xs">機能一覧（1行1項目）</Label>
+                    <Textarea value={form.detail_features} onChange={(e) => handleChange("detail_features", e.target.value)} rows={3} placeholder={"エントリーシグナル表示\nトレンド強度メーター\nアラート機能"} />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ====== G4: アクション ====== */}
+            <div className="max-w-3xl mx-auto space-y-3">
+              {!isEditing && (
+                <p className="text-xs text-muted-foreground text-center">
+                  出品された商品は管理者の審査後に掲載されます
+                </p>
+              )}
+              <div className="flex gap-3">
+                <Button type="submit" variant="hero" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isUploadingImage ? "画像アップロード中..." : "保存中..."}
+                    </>
+                  ) : isEditing ? (
+                    "商品を更新"
+                  ) : (
+                    "商品を出品"
+                  )}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => navigate("/seller/products")}>
+                  キャンセル
+                </Button>
+              </div>
             </div>
           </form>
         </div>

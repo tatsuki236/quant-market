@@ -5,15 +5,17 @@ import { Loader2 } from "lucide-react";
 type ProtectedRouteProps = {
   children: React.ReactNode;
   requireSeller?: boolean;
+  requireAdmin?: boolean;
   redirectTo?: string;
 };
 
 const ProtectedRoute = ({
   children,
   requireSeller = false,
+  requireAdmin = false,
   redirectTo = "/seller/login",
 }: ProtectedRouteProps) => {
-  const { user, seller, isLoading } = useAuth();
+  const { user, seller, isAdmin, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -27,8 +29,12 @@ const ProtectedRoute = ({
     return <Navigate to={redirectTo} replace />;
   }
 
-  if (requireSeller && !seller) {
+  if ((requireSeller || requireAdmin) && !seller) {
     return <Navigate to="/seller/register" replace />;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return <Navigate to="/seller/dashboard" replace />;
   }
 
   return <>{children}</>;

@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Indicators from "./pages/Indicators";
 import Products from "./pages/Products";
+import Articles from "./pages/Articles";
 import ProductDetail from "./pages/ProductDetail";
 import Buyers from "./pages/Buyers";
 import Sellers from "./pages/Sellers";
@@ -34,9 +35,16 @@ import SellerProducts from "./pages/seller/SellerProducts";
 import SellerProductForm from "./pages/seller/SellerProductForm";
 import SellerProfile from "./pages/seller/SellerProfile";
 
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AdminSellers from "./pages/admin/AdminSellers";
+
 // Buyer pages
 import BuyerLogin from "./pages/account/BuyerLogin";
 import BuyerRegister from "./pages/account/BuyerRegister";
+import ForgotPassword from "./pages/account/ForgotPassword";
+import ResetPassword from "./pages/account/ResetPassword";
 import MyPage from "./pages/account/MyPage";
 
 const queryClient = new QueryClient();
@@ -59,6 +67,9 @@ const App = () => (
           {/* Products */}
           <Route path="/products" element={<Products />} />
           <Route path="/products/:slug" element={<ProductDetail />} />
+
+          {/* Articles */}
+          <Route path="/articles" element={<Articles />} />
 
           {/* Cart & Checkout */}
           <Route path="/cart" element={<Cart />} />
@@ -104,9 +115,22 @@ const App = () => (
             <ProtectedRoute requireSeller><SellerProfile /></ProtectedRoute>
           } />
 
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>
+          } />
+          <Route path="/admin/products" element={
+            <ProtectedRoute requireAdmin><AdminProducts /></ProtectedRoute>
+          } />
+          <Route path="/admin/sellers" element={
+            <ProtectedRoute requireAdmin><AdminSellers /></ProtectedRoute>
+          } />
+
           {/* Buyer / Account Routes */}
           <Route path="/account/login" element={<BuyerLogin />} />
           <Route path="/account/register" element={<BuyerRegister />} />
+          <Route path="/account/forgot-password" element={<ForgotPassword />} />
+          <Route path="/account/reset-password" element={<ResetPassword />} />
           <Route path="/account/mypage" element={
             <ProtectedRoute redirectTo="/account/login"><MyPage /></ProtectedRoute>
           } />

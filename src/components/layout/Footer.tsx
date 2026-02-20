@@ -10,7 +10,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
       { path: "/products?market=株式", label: "株式インジケータ" },
       { path: "/products?market=仮想通貨", label: "仮想通貨インジケータ" },
       { path: "/products?market=FX", label: "為替(FX)インジケータ" },
-      { path: "/products?category=有料記事", label: "有料ブログ" },
+      { path: "/products?category=有料記事", label: "電子書籍" },
     ],
     support: [
       { path: "/buyers", label: "購入者ガイド" },
@@ -32,7 +32,7 @@ const Footer = forwardRef<HTMLElement>((_, ref) => {
   return (
     <footer ref={ref} className="border-t border-border bg-card">
       <div className="section-container py-12 lg:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-4 md:mb-0">
             <Link to="/" className="flex items-center gap-2 mb-4">

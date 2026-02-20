@@ -30,6 +30,20 @@ const Sellers = () => {
         </div>
       </section>
 
+      {/* 出品者アカウント作成 CTA */}
+      <section className="py-10 lg:py-12">
+        <div className="section-container">
+          <div className="max-w-2xl mx-auto text-center">
+            <Button variant="accent" size="lg" asChild>
+              <Link to="/seller/register">
+                出品者アカウントを作成
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Why QuantMarket */}
       <section className="py-16 lg:py-20">
         <div className="section-container">

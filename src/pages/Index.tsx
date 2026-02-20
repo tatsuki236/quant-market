@@ -64,10 +64,10 @@ const Index = () => {
             />
           )}
 
-          {/* 有料ブログ（有料記事） */}
+          {/* 電子書籍 */}
           {blogProducts.length > 0 && (
             <ProductCategorySlider
-              title="有料ブログ"
+              title="電子書籍"
               products={blogProducts}
               viewAllLink="/products?category=有料記事"
             />

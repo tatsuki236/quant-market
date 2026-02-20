@@ -1,12 +1,12 @@
 import Layout from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Package, User, Plus, Loader2 } from "lucide-react";
+import { Package, User, Plus, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSellerProducts } from "@/hooks/use-seller-products";
 
 const SellerDashboard = () => {
-  const { seller } = useAuth();
+  const { seller, isAdmin } = useAuth();
   const { data: products = [], isLoading } = useSellerProducts();
 
   const publishedCount = products.filter((p) => p.is_published).length;
@@ -59,6 +59,20 @@ const SellerDashboard = () => {
 
           {/* Quick Links */}
           <div className="grid md:grid-cols-2 gap-6">
+            {isAdmin && (
+              <Link
+                to="/admin/dashboard"
+                className="group flex items-center gap-4 p-6 rounded-xl bg-card border border-primary/30 hover:border-primary/50 transition-all md:col-span-2"
+              >
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <ShieldCheck className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold group-hover:text-primary transition-colors">管理者ダッシュボード</h3>
+                  <p className="text-sm text-muted-foreground">商品審査・出品者管理</p>
+                </div>
+              </Link>
+            )}
             <Link
               to="/seller/products"
               className="group flex items-center gap-4 p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"

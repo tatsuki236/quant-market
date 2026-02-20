@@ -9,6 +9,7 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   seller: SellerProfile | null;
+  isAdmin: boolean;
   isLoading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -82,9 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSeller(null);
   };
 
+  const isAdmin = seller?.is_admin === true;
+
   return (
     <AuthContext.Provider
-      value={{ user, session, seller, isLoading, signUp, signIn, signOut, refreshSeller }}
+      value={{ user, session, seller, isAdmin, isLoading, signUp, signIn, signOut, refreshSeller }}
     >
       {children}
     </AuthContext.Provider>
