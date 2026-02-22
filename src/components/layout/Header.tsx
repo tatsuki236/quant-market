@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
-  Menu, X, TrendingUp, ShoppingCart, UserPlus, LogIn,
+  Menu, X, TrendingUp, ShoppingCart, UserPlus, LogIn, LogOut,
   Search, User, LayoutDashboard, BarChart3, BookOpen, Store,
 } from "lucide-react";
 import { useState } from "react";
@@ -15,7 +15,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { itemCount } = useCart();
-  const { user, seller } = useAuth();
+  const { user, seller, signOut } = useAuth();
 
   const isActive = (path: string) =>
     location.pathname === path || location.pathname.startsWith(path + "?");
@@ -135,15 +135,26 @@ const Header = () => {
 
             {/* アカウント */}
             {user ? (
-              <Button variant="ghost" size="sm" asChild>
-                <Link
-                  to={seller ? "/seller/dashboard" : "/account/mypage"}
-                  className="flex items-center gap-1.5"
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link
+                    to={seller ? "/seller/dashboard" : "/account/mypage"}
+                    className="flex items-center gap-1.5"
+                  >
+                    {seller ? <LayoutDashboard className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                    {seller ? "出品者管理" : "マイページ"}
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { signOut(); navigate("/"); }}
+                  className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
                 >
-                  {seller ? <LayoutDashboard className="h-4 w-4" /> : <User className="h-4 w-4" />}
-                  {seller ? "出品者管理" : "マイページ"}
-                </Link>
-              </Button>
+                  <LogOut className="h-4 w-4" />
+                  ログアウト
+                </Button>
+              </>
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild>
@@ -237,14 +248,23 @@ const Header = () => {
               </div>
 
               {user ? (
-                <Link
-                  to={seller ? "/seller/dashboard" : "/account/mypage"}
-                  onClick={closeMobile}
-                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-                >
-                  {seller ? <LayoutDashboard className="h-4 w-4" /> : <User className="h-4 w-4" />}
-                  {seller ? "出品者管理" : "マイページ"}
-                </Link>
+                <>
+                  <Link
+                    to={seller ? "/seller/dashboard" : "/account/mypage"}
+                    onClick={closeMobile}
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                  >
+                    {seller ? <LayoutDashboard className="h-4 w-4" /> : <User className="h-4 w-4" />}
+                    {seller ? "出品者管理" : "マイページ"}
+                  </Link>
+                  <button
+                    onClick={() => { signOut(); closeMobile(); navigate("/"); }}
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors w-full text-left"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    ログアウト
+                  </button>
+                </>
               ) : (
                 <>
                   <Link
