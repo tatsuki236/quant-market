@@ -20,21 +20,21 @@ const Law = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 pb-4 border-b border-border">
                     <dt className="font-medium">販売業者</dt>
                     <dd className="md:col-span-2 text-muted-foreground">
-                      QuantMarket（クオンツマーケット）
+                      合同会社LEXER
                     </dd>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 pb-4 border-b border-border">
                     <dt className="font-medium">運営責任者</dt>
                     <dd className="md:col-span-2 text-muted-foreground">
-                      [お問い合わせ時に開示]
+                      茂木 樹
                     </dd>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 pb-4 border-b border-border">
                     <dt className="font-medium">所在地</dt>
                     <dd className="md:col-span-2 text-muted-foreground">
-                      [お問い合わせ時に開示]
+                      東京都港区南青山2-2-15
                     </dd>
                   </div>
 
@@ -116,8 +116,7 @@ const Law = () => {
 
               <div className="p-6 rounded-xl bg-muted/50 border border-border">
                 <p className="text-sm text-muted-foreground">
-                  ※ 住所・電話番号等の個人情報は、お問い合わせいただいた方にのみ開示いたします。
-                  スパム対策のため、ウェブサイト上での公開は控えさせていただいております。
+                  ※ 電話番号はお問い合わせいただいた方にのみ開示いたします。
                 </p>
               </div>
             </div>
