@@ -25,7 +25,7 @@ const Articles = () => {
           )}
 
           {!isLoading && (
-            <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-6 mb-8">
               {articles.map((article) => (
                 <Link
                   key={article.slug}
@@ -45,7 +45,7 @@ const Articles = () => {
 
                   {/* Mobile content — 楽天スタイル */}
                   <div className="px-1.5 pt-1.5 pb-2 flex flex-col flex-1 sm:hidden">
-                    <h3 className="text-[11px] leading-[1.3] font-medium mb-1 group-hover:text-primary transition-colors line-clamp-2 break-words">
+                    <h3 className="text-xs leading-[1.3] font-medium mb-1 group-hover:text-primary transition-colors line-clamp-2 break-words">
                       {article.name}
                     </h3>
                     {article.rating_count > 0 && (

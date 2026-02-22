@@ -291,7 +291,7 @@ const SellerProductForm = () => {
 
               {/* インジケータ専用: プラットフォーム・市場・アイコン */}
               {form.category !== "有料記事" && (
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                   <div className="space-y-1">
                     <Label className="text-xs">プラットフォーム</Label>
                     <Select value={form.platform} onValueChange={(v) => handleChange("platform", v)}>

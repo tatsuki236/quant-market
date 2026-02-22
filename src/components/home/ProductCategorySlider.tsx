@@ -153,7 +153,7 @@ const ProductCategorySlider = ({
                         )}
                       </div>
                       <div className="px-1.5 pt-1.5 pb-2">
-                        <h3 className="text-[11px] leading-[1.3] font-medium line-clamp-2 mb-1 group-hover:text-primary transition-colors min-h-[1.8em] break-words">
+                        <h3 className="text-xs leading-[1.3] font-medium line-clamp-2 mb-1 group-hover:text-primary transition-colors min-h-[1.8em] break-words">
                           {product.name}
                         </h3>
                         {product.rating_count > 0 && (

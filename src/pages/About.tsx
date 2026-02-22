@@ -55,31 +55,31 @@ const About = () => {
             <div className="p-8 rounded-xl bg-card border border-border">
               <h2 className="text-xl font-semibold mb-6">事業者情報</h2>
               <dl className="space-y-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">サイト名</dt>
-                  <dd className="col-span-2">QuantMarket（クオンツマーケット）</dd>
+                  <dd className="md:col-span-2">QuantMarket（クオンツマーケット）</dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">URL</dt>
-                  <dd className="col-span-2">https://quantsmarket.com</dd>
+                  <dd className="md:col-span-2">https://quantsmarket.com</dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">お問い合わせ</dt>
-                  <dd className="col-span-2">support@quantsmarket.com</dd>
+                  <dd className="md:col-span-2">support@quantsmarket.com</dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">事業内容</dt>
-                  <dd className="col-span-2">
+                  <dd className="md:col-span-2">
                     テクニカルインジケータの販売
                   </dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">対応プラットフォーム</dt>
-                  <dd className="col-span-2">MT4 / MT5 / TradingView</dd>
+                  <dd className="md:col-span-2">MT4 / MT5 / TradingView</dd>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <dt className="text-muted-foreground">対象市場</dt>
-                  <dd className="col-span-2">株式 / FX / 仮想通貨</dd>
+                  <dd className="md:col-span-2">株式 / FX / 仮想通貨</dd>
                 </div>
               </dl>
             </div>

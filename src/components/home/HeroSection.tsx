@@ -8,7 +8,7 @@ const HeroSection = () => {
   const isLight = theme === "light";
 
   return (
-    <section className="relative h-[90vh] min-h-[600px] w-full overflow-hidden flex items-center justify-center text-white">
+    <section className="relative h-[90vh] min-h-[500px] w-full overflow-hidden flex items-center justify-center text-white">
       {/* Background — テーマ別オーバーレイ、動画は共通 */}
       <div className="absolute inset-0 z-0">
         <div className={`absolute inset-0 z-10 ${isLight ? "bg-white/40" : "bg-black/60"}`} />
