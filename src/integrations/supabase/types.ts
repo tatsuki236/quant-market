@@ -135,6 +135,9 @@ export type Database = {
           product_slug: string
           product_name: string
           price: number
+          seller_id: string | null
+          platform_fee: number
+          seller_amount: number
           created_at: string
         }
         Insert: {
@@ -144,6 +147,9 @@ export type Database = {
           product_slug: string
           product_name: string
           price: number
+          seller_id?: string | null
+          platform_fee?: number
+          seller_amount?: number
           created_at?: string
         }
         Update: {
@@ -153,6 +159,9 @@ export type Database = {
           product_slug?: string
           product_name?: string
           price?: number
+          seller_id?: string | null
+          platform_fee?: number
+          seller_amount?: number
           created_at?: string
         }
         Relationships: [
@@ -201,6 +210,7 @@ export type Database = {
           rating_average: number | null
           rating_count: number
           status: string
+          commission_rate: number | null
         }
         Insert: {
           id?: string
@@ -230,6 +240,7 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number
           status?: string
+          commission_rate?: number | null
         }
         Update: {
           id?: string
@@ -259,6 +270,7 @@ export type Database = {
           rating_average?: number | null
           rating_count?: number
           status?: string
+          commission_rate?: number | null
         }
         Relationships: []
       }

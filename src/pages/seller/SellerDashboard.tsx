@@ -1,16 +1,17 @@
 import Layout from "@/components/layout/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Package, User, Plus, Loader2, ShieldCheck } from "lucide-react";
+import { Package, User, Plus, Loader2, ShieldCheck, TrendingUp, Receipt, Wallet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSellerProducts } from "@/hooks/use-seller-products";
+import { useSellerRevenue } from "@/hooks/use-seller-revenue";
 
 const SellerDashboard = () => {
   const { seller, isAdmin } = useAuth();
   const { data: products = [], isLoading } = useSellerProducts();
+  const { data: revenue, isLoading: isRevenueLoading } = useSellerRevenue();
 
   const publishedCount = products.filter((p) => p.is_published).length;
-  const totalRevenue = 0; // TODO: 売上集計は将来実装
 
   return (
     <Layout>
@@ -31,34 +32,91 @@ const SellerDashboard = () => {
             </Button>
           </div>
 
-          {/* Stats */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="p-6 rounded-xl bg-card border border-border">
-              <p className="text-sm text-muted-foreground mb-1">登録商品数</p>
-              <p className="text-3xl font-bold">
-                {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : products.length}
-              </p>
-            </div>
-            <div className="p-6 rounded-xl bg-card border border-border">
-              <p className="text-sm text-muted-foreground mb-1">公開中</p>
-              <p className="text-3xl font-bold text-primary">
-                {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : publishedCount}
-              </p>
-            </div>
-            <div className="p-6 rounded-xl bg-card border border-border">
-              <p className="text-sm text-muted-foreground mb-1">承認ステータス</p>
-              <p className="text-lg font-semibold">
-                {seller?.is_approved ? (
-                  <span className="text-success">承認済み</span>
-                ) : (
-                  <span className="text-yellow-500">審査中</span>
-                )}
-              </p>
+          {/* 承認ステータス */}
+          <div className="p-4 rounded-xl bg-card border border-border mb-6 flex items-center gap-3">
+            <ShieldCheck className="h-5 w-5 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">承認ステータス:</span>
+            {seller?.is_approved ? (
+              <span className="text-sm font-semibold text-success">承認済み</span>
+            ) : (
+              <span className="text-sm font-semibold text-yellow-500">審査中</span>
+            )}
+          </div>
+
+          {/* 商品統計 */}
+          <div className="mb-6">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3">商品</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-5 rounded-xl bg-card border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">登録商品数</p>
+                </div>
+                <p className="text-2xl font-bold">
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : products.length}
+                </p>
+              </div>
+              <div className="p-5 rounded-xl bg-card border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Package className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">公開中</p>
+                </div>
+                <p className="text-2xl font-bold text-primary">
+                  {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : publishedCount}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* 収益統計 */}
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3">収益</h2>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="p-5 rounded-xl bg-card border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">売上合計</p>
+                </div>
+                <p className="text-2xl font-bold">
+                  {isRevenueLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    `¥${(revenue?.totalSales ?? 0).toLocaleString()}`
+                  )}
+                </p>
+              </div>
+              <div className="p-5 rounded-xl bg-card border border-border">
+                <div className="flex items-center gap-2 mb-2">
+                  <Receipt className="h-4 w-4 text-destructive" />
+                  <p className="text-xs text-muted-foreground">手数料</p>
+                </div>
+                <p className="text-2xl font-bold text-destructive">
+                  {isRevenueLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    `-¥${(revenue?.totalFee ?? 0).toLocaleString()}`
+                  )}
+                </p>
+              </div>
+              <div className="p-5 rounded-xl bg-card border border-primary/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Wallet className="h-4 w-4 text-primary" />
+                  <p className="text-xs text-muted-foreground">受取額</p>
+                </div>
+                <p className="text-2xl font-bold text-primary">
+                  {isRevenueLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    `¥${(revenue?.totalPayout ?? 0).toLocaleString()}`
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* クイックアクション */}
+          <h2 className="text-sm font-semibold text-muted-foreground mb-3">メニュー</h2>
+          <div className="grid md:grid-cols-2 gap-4">
             {isAdmin && (
               <Link
                 to="/admin/dashboard"

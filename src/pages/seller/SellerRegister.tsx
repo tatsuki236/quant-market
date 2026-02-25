@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 const SellerRegister = () => {
   const navigate = useNavigate();
@@ -116,6 +117,13 @@ const SellerRegister = () => {
         <div className="section-container max-w-md mx-auto">
           <h1 className="text-2xl font-bold text-center mb-8">出品者登録</h1>
 
+          <div className="p-4 rounded-xl bg-muted/50 border border-border text-sm text-muted-foreground mb-6">
+            <p className="font-medium text-foreground mb-1">販売手数料について</p>
+            <p>
+              商品が売れた際、販売価格の <span className="font-semibold text-foreground">20%</span> をプラットフォーム手数料として差し引き、残りの <span className="font-semibold text-foreground">80%</span> が出品者様の受取額となります。
+            </p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6 p-6 rounded-xl bg-card border border-border">
             {user && (
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm text-muted-foreground">
@@ -200,12 +208,25 @@ const SellerRegister = () => {
             </Button>
 
             {!user && (
-              <p className="text-center text-sm text-muted-foreground">
-                既にアカウントをお持ちの方は
-                <Link to="/seller/login" className="text-primary hover:underline ml-1">
-                  ログイン
-                </Link>
-              </p>
+              <>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">または</span>
+                  </div>
+                </div>
+
+                <GoogleSignInButton role="seller" label="Googleで登録" />
+
+                <p className="text-center text-sm text-muted-foreground">
+                  既にアカウントをお持ちの方は
+                  <Link to="/seller/login" className="text-primary hover:underline ml-1">
+                    ログイン
+                  </Link>
+                </p>
+              </>
             )}
           </form>
         </div>

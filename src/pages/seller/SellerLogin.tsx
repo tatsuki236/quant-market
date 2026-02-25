@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 const SellerLogin = () => {
   const navigate = useNavigate();
@@ -42,47 +43,59 @@ const SellerLogin = () => {
         <div className="section-container max-w-md mx-auto">
           <h1 className="text-2xl font-bold text-center mb-8">出品者ログイン</h1>
 
-          <form onSubmit={handleSubmit} className="space-y-6 p-6 rounded-xl bg-card border border-border">
-            <div className="space-y-2">
-              <Label htmlFor="email">メールアドレス</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="seller@example.com"
-                required
-              />
+          <div className="space-y-6 p-6 rounded-xl bg-card border border-border">
+            <GoogleSignInButton role="seller" />
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">または</span>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">パスワード</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">メールアドレス</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seller@example.com"
+                  required
+                />
+              </div>
 
-            <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ログイン中...
-                </>
-              ) : (
-                "ログイン"
-              )}
-            </Button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">パスワード</Label>
+                  <Link to="/account/forgot-password" className="text-xs text-primary hover:underline">
+                    パスワードを忘れた方
+                  </Link>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
 
-            <p className="text-center text-sm">
-              <Link to="/account/forgot-password" className="text-primary hover:underline">
-                パスワードを忘れた方
-              </Link>
-            </p>
+              <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ログイン中...
+                  </>
+                ) : (
+                  "メールアドレスでログイン"
+                )}
+              </Button>
+            </form>
 
             <p className="text-center text-sm text-muted-foreground">
               アカウントをお持ちでない方は
@@ -90,7 +103,7 @@ const SellerLogin = () => {
                 新規登録
               </Link>
             </p>
-          </form>
+          </div>
         </div>
       </section>
     </Layout>

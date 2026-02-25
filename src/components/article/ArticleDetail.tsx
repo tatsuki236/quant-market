@@ -8,7 +8,7 @@ const PROSE_CLASSES =
   "prose prose-sm sm:prose dark:prose-invert max-w-none [&_img]:rounded-lg [&_img]:max-w-full [&_pre]:relative [&_pre]:bg-[#1e1e2e] [&_pre]:text-[#cdd6f4] [&_pre]:rounded-lg [&_pre]:p-4 [&_pre]:pr-14 [&_pre]:overflow-x-auto [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:text-sm [&_pre_code]:font-mono [&_mark]:rounded [&_mark]:px-0.5 [&_a]:text-primary [&_a]:underline";
 
 /** コンテナ内の <pre> にコピーボタンを付与 */
-function useCodeCopyButtons(ref: React.RefObject<HTMLDivElement | null>, deps: any[]) {
+function useCodeCopyButtons(ref: React.RefObject<HTMLDivElement | null>, deps: unknown[]) {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -28,6 +28,7 @@ function useCodeCopyButtons(ref: React.RefObject<HTMLDivElement | null>, deps: a
       pre.style.position = "relative";
       pre.appendChild(btn);
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
 

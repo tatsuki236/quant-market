@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 
 const BuyerRegister = () => {
   const navigate = useNavigate();
@@ -157,6 +158,17 @@ const BuyerRegister = () => {
                 "アカウントを作成"
               )}
             </Button>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-border" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">または</span>
+              </div>
+            </div>
+
+            <GoogleSignInButton role="buyer" label="Googleで登録" />
 
             <p className="text-center text-sm text-muted-foreground">
               既にアカウントをお持ちの方は

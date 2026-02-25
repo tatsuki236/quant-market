@@ -39,6 +39,10 @@ import SellerProfile from "./pages/seller/SellerProfile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts";
 import AdminSellers from "./pages/admin/AdminSellers";
+import AdminOrders from "./pages/admin/AdminOrders";
+
+// Auth pages
+import AuthCallback from "./pages/auth/AuthCallback";
 
 // Buyer pages
 import BuyerLogin from "./pages/account/BuyerLogin";
@@ -96,6 +100,9 @@ const App = () => (
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/law" element={<Law />} />
 
+          {/* Auth Callback */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
+
           {/* Seller Routes */}
           <Route path="/seller/login" element={<SellerLogin />} />
           <Route path="/seller/register" element={<SellerRegister />} />
@@ -124,6 +131,9 @@ const App = () => (
           } />
           <Route path="/admin/sellers" element={
             <ProtectedRoute requireAdmin><AdminSellers /></ProtectedRoute>
+          } />
+          <Route path="/admin/orders" element={
+            <ProtectedRoute requireAdmin><AdminOrders /></ProtectedRoute>
           } />
 
           {/* Buyer / Account Routes */}

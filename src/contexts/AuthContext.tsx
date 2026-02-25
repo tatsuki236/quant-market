@@ -13,6 +13,7 @@ type AuthContextType = {
   isLoading: boolean;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: (role: "buyer" | "seller") => Promise<void>;
   signOut: () => Promise<void>;
   refreshSeller: () => Promise<void>;
 };
@@ -78,6 +79,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error ? new Error(error.message) : null };
   };
 
+  const signInWithGoogle = async (role: "buyer" | "seller") => {
+    localStorage.setItem("oauth_role", role);
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/auth/callback",
+      },
+    });
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setSeller(null);
@@ -87,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, seller, isAdmin, isLoading, signUp, signIn, signOut, refreshSeller }}
+      value={{ user, session, seller, isAdmin, isLoading, signUp, signIn, signInWithGoogle, signOut, refreshSeller }}
     >
       {children}
     </AuthContext.Provider>

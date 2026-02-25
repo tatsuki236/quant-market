@@ -147,7 +147,7 @@ const SellerProductForm = () => {
       setIsUploadingImage(false);
     }
 
-    const payload: Record<string, any> = {
+    const payload: Record<string, unknown> = {
       slug: form.slug,
       name: form.name,
       description: form.description,

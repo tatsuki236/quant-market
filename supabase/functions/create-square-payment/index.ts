@@ -133,17 +133,24 @@ serve(async (req: Request): Promise<Response> => {
     for (const item of items) {
       const { data: product } = await supabase
         .from("products")
-        .select("id")
+        .select("id, seller_id, commission_rate")
         .eq("slug", item.productId)
         .maybeSingle();
 
       if (product) {
+        const feeRate = product.commission_rate ?? 0.20;
+        const platformFee = Math.round(item.price * feeRate);
+        const sellerAmount = item.price - platformFee;
+
         await supabase.from("order_items").insert({
           order_id: orderId,
           product_id: product.id,
           product_slug: item.productId,
           product_name: item.name,
           price: item.price,
+          seller_id: product.seller_id ?? null,
+          platform_fee: platformFee,
+          seller_amount: sellerAmount,
         });
       }
     }

@@ -58,8 +58,11 @@ const HeroSection = () => {
           }`}>
             Quant
           </span>
-          <br />
-          <span className={`text-4xl md:text-6xl lg:text-7xl font-light ${isLight ? "text-gray-500" : "text-gray-400"}`}>
+          <span className={`bg-clip-text text-transparent bg-gradient-to-r ${
+            isLight
+              ? "from-gray-500 via-gray-700 to-gray-900"
+              : "from-gray-400 via-gray-200 to-white"
+          }`}>
             Market
           </span>
         </h1>

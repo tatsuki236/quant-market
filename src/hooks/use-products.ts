@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { resolveIcon } from "@/lib/icon-map";
 import type { ProductRow, Product } from "@/types/product";
 
-function toProduct(row: any): Product {
+function toProduct(row: Record<string, unknown>): Product {
   const { icon_name, sellers, ...rest } = row;
   return {
     ...rest,

@@ -54,25 +54,26 @@ const AdminSellers = () => {
               {sellers.map((seller) => (
                 <div
                   key={seller.id}
-                  className="p-4 rounded-xl bg-card border border-border"
+                  className="rounded-xl bg-card border border-border overflow-hidden"
                 >
-                  <div className="flex items-center justify-between gap-4 mb-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold truncate">{seller.display_name}</h3>
-                        {seller.is_admin && (
-                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                            <ShieldCheck className="h-3 w-3 mr-1" />
-                            管理者
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {seller.email} ・ 登録: {new Date(seller.created_at).toLocaleDateString("ja-JP")}
-                      </p>
+                  {/* 出品者情報 */}
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold truncate">{seller.display_name}</h3>
+                      {seller.is_admin && (
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                          <ShieldCheck className="h-3 w-3 mr-1" />
+                          管理者
+                        </Badge>
+                      )}
                     </div>
+                    <p className="text-sm text-muted-foreground">
+                      {seller.email} ・ 登録: {new Date(seller.created_at).toLocaleDateString("ja-JP")}
+                    </p>
                   </div>
-                  <div className="flex items-center gap-6">
+
+                  {/* ステータス管理 */}
+                  <div className="flex items-center gap-6 px-4 py-3 bg-muted/30 border-t border-border">
                     <label className="flex items-center gap-2 text-sm">
                       <Switch
                         checked={seller.is_approved}

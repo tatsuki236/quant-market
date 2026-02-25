@@ -1,4 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import type { EditorView } from "prosemirror-view";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -129,7 +130,7 @@ const RichEditor = ({ value, onChange, placeholder, label }: RichEditorProps) =>
           const { node } = editor.view.domAtPos(editor.state.selection.anchor);
           const el = node instanceof HTMLElement ? node : node.parentElement;
           el?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-        } catch {}
+        } catch { /* scroll may fail if DOM not ready */ }
       });
     },
     onSelectionUpdate: ({ editor }) => {
@@ -184,7 +185,7 @@ const RichEditor = ({ value, onChange, placeholder, label }: RichEditorProps) =>
     if (!editor) return;
     editor.setOptions({
       editorProps: {
-        handlePaste: (view: any, event: ClipboardEvent) => {
+        handlePaste: (_view: EditorView, event: ClipboardEvent) => {
           const items = event.clipboardData?.items;
           if (!items) return false;
           for (const item of items) {
@@ -197,7 +198,7 @@ const RichEditor = ({ value, onChange, placeholder, label }: RichEditorProps) =>
           }
           return false;
         },
-        handleDrop: (view: any, event: DragEvent) => {
+        handleDrop: (_view: EditorView, event: DragEvent) => {
           const files = event.dataTransfer?.files;
           if (!files?.length) return false;
           for (const file of files) {

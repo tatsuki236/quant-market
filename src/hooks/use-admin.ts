@@ -4,6 +4,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type ProductRow = Tables<"products">;
 type SellerRow = Tables<"sellers">;
+type OrderRow = Tables<"orders">;
 
 // 全商品取得（出品者名付き）
 export function useAdminProducts() {
@@ -106,6 +107,71 @@ export function useUpdateSeller() {
   });
 }
 
+// 商品の手数料率を更新
+export function useUpdateCommissionRate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      productId,
+      commissionRate,
+    }: {
+      productId: string;
+      commissionRate: number;
+    }) => {
+      const { error } = await supabase
+        .from("products")
+        .update({ commission_rate: commissionRate })
+        .eq("id", productId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+  });
+}
+
+// 全注文取得
+export function useAdminOrders() {
+  return useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data as OrderRow[];
+    },
+  });
+}
+
+// 注文の決済ステータス更新
+export function useUpdateOrderStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      orderId,
+      status,
+    }: {
+      orderId: string;
+      status: string;
+    }) => {
+      const { error } = await supabase
+        .from("orders")
+        .update({ payment_status: status })
+        .eq("id", orderId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+  });
+}
+
 // 統計データ
 export function useAdminStats() {
   return useQuery({
@@ -114,17 +180,23 @@ export function useAdminStats() {
       const [productsRes, sellersRes, ordersRes] = await Promise.all([
         supabase.from("products").select("id, status", { count: "exact" }),
         supabase.from("sellers").select("id", { count: "exact" }),
-        supabase.from("orders").select("id", { count: "exact" }),
+        supabase.from("orders").select("id, payment_method, payment_status", { count: "exact" }),
       ]);
 
       const products = productsRes.data ?? [];
       const pendingCount = products.filter((p) => p.status === "審査中").length;
+
+      const orders = ordersRes.data ?? [];
+      const pendingBankOrders = orders.filter(
+        (o) => o.payment_method === "bank_transfer" && o.payment_status === "pending"
+      ).length;
 
       return {
         totalProducts: productsRes.count ?? 0,
         pendingProducts: pendingCount,
         totalSellers: sellersRes.count ?? 0,
         totalOrders: ordersRes.count ?? 0,
+        pendingBankOrders,
       };
     },
   });

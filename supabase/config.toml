@@ -1,1 +1,48 @@
-project_id = "eczcyvivxritqejbvmwq"
+project_id = "ipjpwvjmvpynbukxbynr"
+
+[auth]
+enabled = true
+site_url = "https://quantsmarket.com"
+additional_redirect_urls = ["https://quantsmarket.com/auth/callback", "https://quantsmarket.vercel.app/auth/callback", "http://localhost:8080/auth/callback"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.mfa.web_authn]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1m0s"
+otp_length = 8
+otp_expiry = 3600
+
+[auth.email.template.confirmation]
+subject = "QuantMarket - アカウント登録の確認"
+content_path = "./supabase/templates/confirm_signup.html"
+
+[auth.email.template.magic_link]
+subject = "QuantMarket - ログインリンク"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.change_email_address]
+subject = "QuantMarket - メールアドレス変更の確認"
+content_path = "./supabase/templates/change_email.html"
+
+[auth.email.template.reset_password]
+subject = "QuantMarket - パスワードリセット"
+content_path = "./supabase/templates/reset_password.html"
